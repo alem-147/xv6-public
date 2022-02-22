@@ -232,8 +232,8 @@ exit(int status)
   int fd;
 
   if(curproc == initproc)
-    panic("init exiting");
-
+		curproc->exit_status = -1; // error give -1 exit stauts
+	  panic("init exiting");
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
     if(curproc->ofile[fd]){
@@ -262,7 +262,8 @@ exit(int status)
   }
 
   // Jump into the scheduler, never to return.
-  curproc->state = ZOMBIE;
+  curproc->exit_status = status;
+	curproc->state = ZOMBIE;
   sched();
   panic("zombie exit");
 }
