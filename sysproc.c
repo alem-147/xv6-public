@@ -18,7 +18,7 @@ sys_exit(void)
 {
 	int exit_status;
   argint(0, &exit_status);
-	cprintf("exiting with status %d",exit_status); //why does exit_status = ____ break?"
+	cprintf("exiting with status %d\n",exit_status); //why does exit_status = ____ break?"
   exit(exit_status);// what to put in here
   return 0;  // not reached
 }
