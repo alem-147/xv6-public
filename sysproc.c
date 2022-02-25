@@ -19,15 +19,19 @@ sys_exit(void)
 	int exit_status;
   argint(0, &exit_status);
 	cprintf("exiting with status %d\n",exit_status); //why does exit_status = ____ break?"
-  exit(exit_status);// what to put in here
+  exit(exit_status);
   return 0;  // not reached
 }
 
 int
 sys_wait(void)
 {
-	int stat;
-  return wait(&stat);
+	char *stat_loc;
+	int child_pid;
+	argptr(0,&stat_loc,32); // grab arg ptr passed into syscall
+  child_pid =  wait((int *)stat_loc);
+	cprintf("I waited for my child with pid: %d",child_pid);
+	return child_pid;
 }
 
 int
