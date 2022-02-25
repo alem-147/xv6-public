@@ -30,7 +30,7 @@ sys_wait(void)
 	int child_pid;
 	argptr(0,&stat_loc,32); // grab arg ptr passed into syscall
   child_pid =  wait((int *)stat_loc);
-	cprintf("I waited for my child with pid: %d",child_pid);
+	//cprintf("I waited for my child with pid: %d",child_pid);
 	return child_pid;
 }
 
