@@ -271,6 +271,7 @@ exit(int status)
 
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
+// Return 0 on Null pointer
 int
 wait(int *status)
 {
@@ -298,6 +299,8 @@ wait(int *status)
         p->killed = 0;
         p->state = UNUSED;
         release(&ptable.lock);
+				if (!status) //if null pointer
+				return 0;
         return pid;
       }
     }

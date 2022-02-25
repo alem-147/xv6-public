@@ -26,7 +26,7 @@ sys_exit(void)
 int
 sys_wait(void)
 {
-	char *stat_loc;
+	char *stat_loc; //arg ptr requires char ptr
 	int child_pid;
 	argptr(0,&stat_loc,32); // grab arg ptr passed into syscall
   child_pid =  wait((int *)stat_loc);
