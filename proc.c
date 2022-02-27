@@ -273,6 +273,7 @@ exit(int status)
 // Return -1 if this process has no children.
 // Return 0 on Null pointer
 //TODO consider status update
+//TODO implement NULL arg - consider using macro 
 int
 wait(int *status)
 {
@@ -290,6 +291,10 @@ wait(int *status)
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
+				//for exit status
+				//if (status) {
+				*status = p->exit_status;
+				//}
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -300,8 +305,6 @@ wait(int *status)
         p->killed = 0;
         p->state = UNUSED;
         release(&ptable.lock);
-				if (!status) //if null pointer
-				return 0;
         return pid;
       }
     }
