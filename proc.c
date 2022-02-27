@@ -558,7 +558,7 @@ waitpid(int pid, int* status, int options)
 				if(p->state == ZOMBIE) {
         	ret_pid = p->pid;
         	kfree(p->kstack);
-					status = &(p->exit_status); //does the exit status not be reaped with the process
+					*status = p->exit_status;
         	p->kstack = 0;
         	freevm(p->pgdir);
         	p->pid = 0;
