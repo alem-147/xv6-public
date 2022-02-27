@@ -272,6 +272,7 @@ exit(int status)
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 // Return 0 on Null pointer
+//TODO consider status update
 int
 wait(int *status)
 {
@@ -537,9 +538,44 @@ procdump(void)
     cprintf("\n");
   }
 }
-
+//TODO: consider status updates
 int 
 waitpid(int pid, int* status, int options)
 {
- return 0;
+	struct proc *p;
+	int ret_pid = -1;
+	struct proc *curproc = myproc();
+	
+	acquire(&ptable.lock);
+	for(;;) {
+		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+			// if found, check if zombie, else iherit (dont care if our child or not)
+			if(p->pid == pid) {
+				// if zombie clean up
+				if(p->state == ZOMBIE) {
+        	ret_pid = p->pid;
+        	kfree(p->kstack);
+					status = &(p->exit_status); //does the exit status not be reaped with the process
+        	p->kstack = 0;
+        	freevm(p->pgdir);
+        	p->pid = 0;
+        	p->parent = 0;
+        	p->name[0] = 0;
+        	p->killed = 0;
+        	p->state = UNUSED;
+        	release(&ptable.lock);
+        	return ret_pid;
+				}
+				else {
+					// inherit and sleep till exit
+					p->parent = curproc;
+					sleep(curproc, &ptable.lock);
+					// what happens when we wake up
+				}
+			}
+		}
+		// if here then not found
+		release(&ptable.lock);
+		return ret_pid;
+	}	
 }
