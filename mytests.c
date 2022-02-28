@@ -43,23 +43,61 @@ void exittest1(int status) {
 void waittest(void) {
 		int stat;
 		if (fork() == 0) {
-			// this should make stat = 1
-			exit(1);
+			// this should make stat = 82 
+			exit(82);
 		}
 		else {
 			wait(&stat);
 		}
 		printf(1,"my childs exit status was %d. I am a good waiter\n",stat);
 }
+/*
+  must handle options of WNOHANG and 0 for options
+  must check status passed
+  must check that specific pid returned
 
+		how to test if not our child
+*/
 void waitpidtest(void) {
-	//	int i,stat;
-//		int pid[5];
-		
+	int i,stat;
+	int fork_ret;
+	int cpid;
+	// fork 6 children
+	for(i=0; i<6;i = i +1) {
+		fork_ret = fork();
+		if(fork_ret  == 0) { // for some reason ref pid[_] in any way breaks the loop 
+			printf(1, "hi im child number: %d\n",i);
+			int exit_stat = 100 + i;
+			exit(exit_stat); //exit right away
+		}
+		cpid = waitpid(fork_ret,&stat,0);
+		printf(1,"child with pid: %d, exited with status: %d\n",cpid, stat);
+	} 
+}
+
+void waitpidtest1(void) {
+	int i,stat;
+	int fork_ret;
+	int cpid;
+	// fork 6 children
+	for(i=0; i<6;i = i +1) {
+		fork_ret = fork();
+		if(fork_ret  == 0) { // for some reason ref pid[_] in any way breaks the loop 
+			printf(1, "hi im child number: %d\n",i);
+			int exit_stat = 100 + i;
+			exit(exit_stat); //exit right away
+		}
+	}
+	cpid = waitpid(6,&stat,0);//note the pids will range for 4 to 10
+	printf(1,"child with pid: %d, exited with status: %d\n",cpid, stat);
+	cpid = waitpid(8,&stat,0);//note the pids will range for 4 to 10
+	printf(1,"child with pid: %d, exited with status: %d\n",cpid, stat);
 }
 
 int main() {
 	//exittest1(NULL);
-	waittest();
+	//	waittest();
+	//waitpidtest();
+	waitpidtest1();
 	exit(0);
 }

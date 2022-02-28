@@ -273,7 +273,6 @@ exit(int status)
 // Return -1 if this process has no children.
 // Return 0 on Null pointer
 //TODO consider status update
-//TODO implement NULL arg - consider using macro 
 int
 wait(int *status)
 {
@@ -292,9 +291,9 @@ wait(int *status)
       if(p->state == ZOMBIE){
         // Found one.
 				//for exit status
-				//if (status) {
+				if (status != 0) {
 				*status = p->exit_status;
-				//}
+				}
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
@@ -546,19 +545,21 @@ int
 waitpid(int pid, int* status, int options)
 {
 	struct proc *p;
-	int ret_pid = -1;
+	int ret_pid = pid;
 	struct proc *curproc = myproc();
-	
+	int pexists = 0;
 	acquire(&ptable.lock);
 	for(;;) {
 		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
 			// if found, check if zombie, else iherit (dont care if our child or not)
 			if(p->pid == pid) {
+				pexists = 1;
 				// if zombie clean up
 				if(p->state == ZOMBIE) {
         	ret_pid = p->pid;
-        	kfree(p->kstack);
+					if (status != 0)
 					*status = p->exit_status;
+					kfree(p->kstack);
         	p->kstack = 0;
         	freevm(p->pgdir);
         	p->pid = 0;
@@ -569,16 +570,14 @@ waitpid(int pid, int* status, int options)
         	release(&ptable.lock);
         	return ret_pid;
 				}
-				else {
-					// inherit and sleep till exit
-					p->parent = curproc;
-					sleep(curproc, &ptable.lock);
-					// what happens when we wake up
-				}
 			}
 		}
-		// if here then not found
-		release(&ptable.lock);
-		return ret_pid;
+		if(!pexists || curproc->killed) {
+			release(&ptable.lock);
+			return -1;
+		}
+		// inherit and sleep till exit
+		p->parent = curproc;
+		sleep(curproc, &ptable.lock); //does not go away - goes to top of for loop
 	}	
 }
