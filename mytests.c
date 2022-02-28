@@ -92,6 +92,11 @@ void waitpidtest1(void) {
 	printf(1,"child with pid: %d, exited with status: %d\n",cpid, stat);
 	cpid = waitpid(8,&stat,0);//note the pids will range for 4 to 10
 	printf(1,"child with pid: %d, exited with status: %d\n",cpid, stat);
+	//clean up the rest of the processes
+	int has_children = 1;
+	while(has_children != -1) {
+		has_children = wait(NULL);
+	}
 }
 
 int main() {
