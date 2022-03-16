@@ -88,7 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-
+	p->priority_val = 0; //give max priority - placement and val STC
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -198,6 +198,7 @@ fork(void)
   }
   np->sz = curproc->sz;
   np->parent = curproc;
+	np->priority_val = curproc->priority_val; //inherit priority value
   *np->tf = *curproc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
