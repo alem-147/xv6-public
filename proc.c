@@ -535,3 +535,10 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+update_priority(int priority_level)
+{
+	cprintf("i've updated the priority of someone with lvl: %d\n", priority_level);
+	return priority_level;
+}

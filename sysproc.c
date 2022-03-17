@@ -92,3 +92,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int sys_update_priority(void)
+{
+	int priority_level;
+	argint(0,&priority_level);
+	update_priority(priority_level);
+	return priority_level;
+}
