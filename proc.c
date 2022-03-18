@@ -537,8 +537,18 @@ procdump(void)
 }
 
 int
-update_priority(int priority_level)
+update_priority(int n_priority_level)
 {
-	cprintf("i've updated the priority of someone with lvl: %d\n", priority_level);
-	return priority_level;
+	struct proc *curr_proc = myproc();
+	/*
+	maybe don't need lock but maybe race condition if context switch on quantum
+	potentially do before calling function
+	*/
+	acquire(&ptable.lock); 
+	curr_proc->priority_val = n_priority_level;
+	//cprintf("i've updated the priority of someone with lvl: %d\n", n_priority_level);
+	release(&ptable.lock);
+	yield();
+	//cprintf("this process's priority is %d\n",curr_proc->priority_val);
+	return n_priority_level;
 }

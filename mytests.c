@@ -9,7 +9,7 @@
 	test that syscall was created properly
 	check output is:
 	"i've updated someone with priority lvl %d\n"
-
+	"this process's priority is %d\n"
 */
 
 void 
@@ -25,3 +25,4 @@ main()
 	update_priority_test1(23);
 	exit(2);
 }
+
