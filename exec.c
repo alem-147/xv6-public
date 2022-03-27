@@ -94,6 +94,9 @@ exec(char *path, char **argv)
   safestrcpy(curproc->name, last, sizeof(curproc->name));
 
   // Commit to the user image.
+	acquire(&tickslock);
+	curproc->T_start = ticks;
+	release(&tickslock);
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
   curproc->sz = sz;

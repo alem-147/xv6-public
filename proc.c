@@ -262,10 +262,13 @@ exit(int status)
         wakeup1(initproc);
     }
   }
-
+	acquire(&tickslock);
+	curproc->T_finish = ticks;
+	release(&tickslock);
   // Jump into the scheduler, never to return.
   curproc->exit_status = status; //status based on pass from sys_exit
 	curproc->state = ZOMBIE;
+
   sched();
   panic("zombie exit");
 }
