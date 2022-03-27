@@ -334,11 +334,24 @@ scheduler(void)
     sti();
 
     // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		/*
+		//working priority based scheduler
+		struct proc *to_run, *p1;
+		acquire(&ptable.lock);
+		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
+			
+			to_run = p;
+			// find highest priority
+			for(p1 = ptable.proc; p1 < &ptable.proc[NPROC]; p1++){
+				if(p1->state != RUNNABLE)
+						continue;
+				if(to_run->priority_val > p1->priority_val)
+					to_run = p1;
+			}
 
+			p = to_run;
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -353,9 +366,47 @@ scheduler(void)
       // It should have changed its p->state before coming back.
       c->proc = 0;
     }
-    release(&ptable.lock);
+		release(&ptable.lock);
 
-  }
+		*/
+		//my Priority based scheduler
+			
+		struct proc *rp = ptable.proc;
+		int highest_priority = 32;
+		int no_runnable_proc = 1;
+		p = ptable.proc;
+		while(no_runnable_proc) {
+			p++;
+			if(p >= &ptable.proc[NPROC]) p = ptable.proc;
+			if(p->state == RUNNABLE) no_runnable_proc = 0;
+				
+		}
+    acquire(&ptable.lock);
+		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+			// force next itteration of loop if not runnable or has lower or eqaul priority
+			if(p->state != RUNNABLE || p->priority_val >= highest_priority) {
+				continue;
+			}
+			highest_priority = p->priority_val;
+			rp = p;
+		}
+			// Switch to chosen process.  It is the process's job
+    	// to release ptable.lock and then reacquire it
+    	// before jumping back to us.
+    	c->proc = rp;
+    	switchuvm(rp);
+    	rp->state = RUNNING;
+
+    	swtch(&(c->scheduler), rp->context);
+    	switchkvm();
+
+    	// Process is done running for now.
+    	// It should have changed its p->state before coming back.
+    	c->proc = 0;
+
+
+		release(&ptable.lock);
+	}
 }
 
 // Enter scheduler.  Must hold only ptable.lock
