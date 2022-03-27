@@ -88,7 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-	p->priority_val = 0; //give max priority - placement and val STC
+	p->priority_val = 5; //give max priority - placement and val STC
   release(&ptable.lock);
 
   // Allocate kernel stack.
