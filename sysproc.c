@@ -18,7 +18,7 @@ sys_exit(void)
 {
 	int exit_status;
   argint(0, &exit_status);
-	cprintf("exiting with status %d\n",exit_status); 
+	//cprintf("exiting with status %d\n",exit_status); 
   exit(exit_status);// what to put in here
   return 0;  // not reached
 }
@@ -85,12 +85,7 @@ sys_sleep(void)
 int
 sys_uptime(void)
 {
-  uint xticks;
-
-  acquire(&tickslock);
-  xticks = ticks;
-  release(&tickslock);
-  return xticks;
+	return uptime();
 }
 
 int sys_update_priority(void)

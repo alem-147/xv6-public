@@ -222,6 +222,15 @@ fork(void)
   return pid;
 }
 
+int 
+uptime(void)
+{
+	uint xticks;
+	acquire(&tickslock);
+	xticks = ticks;
+	release(&tickslock);
+	return xticks;
+}
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
