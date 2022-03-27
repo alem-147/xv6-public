@@ -273,7 +273,7 @@ exit(int status)
   }
 	acquire(&tickslock);
 	curproc->T_finish = ticks;
-	release(&tickslock);
+	release(&tickslock);	
   // Jump into the scheduler, never to return.
   curproc->exit_status = status; //status based on pass from sys_exit
 	curproc->state = ZOMBIE;
@@ -370,6 +370,7 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
+			p->bursts++;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
@@ -408,7 +409,7 @@ scheduler(void)
     	c->proc = rp;
     	switchuvm(rp);
     	rp->state = RUNNING;
-
+			rp->bursts++;
     	swtch(&(c->scheduler), rp->context);
     	switchkvm();
 
