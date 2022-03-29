@@ -122,7 +122,8 @@ void            wakeup(void*);
 void            yield(void);
 int							update_priority(int);
 int 						uptime(void);
-
+int 						turnaround_time(int);
+int 						waiting_time(int);
 // swtch.S
 void            swtch(struct context**, struct context*);
 

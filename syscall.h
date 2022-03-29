@@ -21,3 +21,5 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_update_priority 22
+#define SYS_turnaround_time 23
+#define	SYS_waiting_time 24

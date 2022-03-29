@@ -305,7 +305,7 @@ wait(void)
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
-        p->pid = 0;
+        //p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
@@ -616,3 +616,40 @@ update_priority(int n_priority_level)
 	//cprintf("this process's priority is %d\n",curr_proc->priority_val);
 	return n_priority_level;
 }
+
+int
+turnaround_time(int proc_id)
+{
+	struct proc *p;
+	cprintf("TT call runing..\nlooking for pid: %d\n", proc_id);
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	//	cprintf("this pid: %d, its state %s\n", p->pid,p->state);
+		if(p->pid != proc_id) continue;
+		//if(p->state != "ZOMBIE"  || p->state != "UNUSED")  needs cast from enum
+			//panic("you called turnaround_time when proc could still run\n");
+		break;
+	}
+	cprintf("found pid: %d\n", p->pid);
+	cprintf("finish tick: %d\n",p->T_finish);
+	cprintf("start tick: %d\n",p->T_start);
+	int turnaround_time = p->T_finish - p->T_start;
+	release(&ptable.lock);
+	return turnaround_time;
+}
+
+int 
+waiting_time(int proc_id)
+{
+	struct proc *p;
+	acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		if(p->pid != proc_id) continue;
+		break;
+	}
+	int bursts = p->bursts;
+	release(&ptable.lock);
+	int waiting_time = turnaround_time(proc_id) - bursts;
+	return waiting_time;
+}
+

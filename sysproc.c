@@ -95,3 +95,19 @@ int sys_update_priority(void)
 	update_priority(priority_level);
 	return priority_level;
 }
+
+int
+sys_turnaround_time(void)
+{
+	int proc_id;
+	argint(0,&proc_id);
+	return turnaround_time(proc_id);
+}
+
+int
+sys_waiting_time(void)
+{
+	int proc_id;
+	argint(0,&proc_id);
+	return waiting_time(proc_id);
+}

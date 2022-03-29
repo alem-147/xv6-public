@@ -24,6 +24,9 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int update_priority(int);
+int turnaround_time(int);
+int waiting_time(int);
+
 
 // ulib.c
 int stat(const char*, struct stat*);
