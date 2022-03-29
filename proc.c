@@ -205,8 +205,7 @@ fork(void)
   np->parent = curproc;
 	np->priority_val = curproc->priority_val; //inherit priority value
   *np->tf = *curproc->tf;
-
-  // Clear %eax so that fork returns 0 in the child.
+	  // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
 
   for(i = 0; i < NOFILE; i++)
@@ -349,9 +348,8 @@ scheduler(void)
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
-    // Loop over process table looking for process to run.
 		/*
+    // Loop over process table looking for process to run.
 		//working priority based scheduler
 		struct proc *to_run, *p1;
 		acquire(&ptable.lock);
@@ -385,8 +383,8 @@ scheduler(void)
       c->proc = 0;
     }
 		release(&ptable.lock);
-
 		*/
+		
 		//my Priority based scheduler
 			
 		struct proc *rp = ptable.proc;
@@ -424,6 +422,7 @@ scheduler(void)
 
 
 		release(&ptable.lock);
+		
 	}
 }
 

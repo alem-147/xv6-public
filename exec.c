@@ -95,7 +95,9 @@ exec(char *path, char **argv)
 
   // Commit to the user image.
 	acquire(&tickslock);
+	cprintf("curr ticks %d\n", ticks);
 	curproc->T_start = ticks;
+	cprintf("my start %d\n", curproc->T_start);
 	release(&tickslock);
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
