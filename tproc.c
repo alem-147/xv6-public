@@ -32,14 +32,18 @@ int main() {
     if ( pid < 0) { 
       printf(1, "%d failed in fork!\n", getpid());
     } 
-		if ((child_pids[k] = pid) > 0) {
+		if(pid > 0) {
+		//if ((child_pids[k] = pid) > 0) {
       // parent
       //printf(1, "Parent %d creating child %d\n",getpid(), pid);
 			if (k == 	MAXCHILDREN-1){
 				clean_children();
-				for(i = 0; i < MAXCHILDREN; i++) 
-					printf(1,"finished %d, pid %d\n",i,finish_rank[i]);
-				}
+				for(i = 0; i < MAXCHILDREN; i++) { 
+					//int mpid = finish_rank[i]; once again ref list breaks stuff
+					printf(1,"finished %d, pid %d\n ",i ,finish_rank[i]);
+					printf(1,"TT: %d, WT: %d\n",turnaround_time(finish_rank[i]), waiting_time(finish_rank[i]));	
+				}	
+			}
 			continue;
       }
       else{
