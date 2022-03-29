@@ -90,6 +90,11 @@ found:
   p->pid = nextpid++;
 	p->priority_val = 5; //give max priority - placement and val STC
   release(&ptable.lock);
+	acquire(&tickslock);
+	cprintf("currticks %d\n",ticks);
+	p->T_start = ticks;
+	cprintf("my start %d\n",p->T_start);
+	release(&tickslock);
 
   // Allocate kernel stack.
   if((p->kstack = kalloc()) == 0){
