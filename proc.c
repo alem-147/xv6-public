@@ -614,7 +614,7 @@ waiting_time(int proc_id)
 	}
 	int bursts = p->bursts;
 	release(&ptable.lock);
-	int waiting_time = p->T_finish - p->T_start - bursts;
+	int waiting_time = p->T_finish - p->T_start - (bursts/2);
 	if (waiting_time < 0) return 0;
 	return waiting_time;
 }
