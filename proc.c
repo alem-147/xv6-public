@@ -585,7 +585,7 @@ int
 turnaround_time(int proc_id)
 {
 	struct proc *p;
-	cprintf("TT call runing..\nlooking for pid: %d\n", proc_id);
+	//cprintf("TT call runing..\nlooking for pid: %d\n", proc_id);
 	acquire(&ptable.lock);
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 	//	cprintf("this pid: %d, its state %s\n", p->pid,p->state);
@@ -594,9 +594,10 @@ turnaround_time(int proc_id)
 			//panic("you called turnaround_time when proc could still run\n");
 		break;
 	}
-	cprintf("found pid: %d\n", p->pid);
-	cprintf("finish tick: %d\n",p->T_finish);
-	cprintf("start tick: %d\n",p->T_start);
+	//cprintf("found pid: %d\n", p->pid);
+	//cprintf("finish tick: %d\n",p->T_finish);
+	//cprintf("start tick: %d\n",p->T_start);
+	//cprintf("bursts: %d\n",p->bursts);
 	int turnaround_time = p->T_finish - p->T_start;
 	release(&ptable.lock);
 	return turnaround_time;
@@ -613,7 +614,8 @@ waiting_time(int proc_id)
 	}
 	int bursts = p->bursts;
 	release(&ptable.lock);
-	int waiting_time = turnaround_time(proc_id) - bursts;
+	int waiting_time = p->T_finish - p->T_start - bursts;
+	if (waiting_time < 0) return 0;
 	return waiting_time;
 }
 
