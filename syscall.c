@@ -17,9 +17,13 @@
 int
 fetchint(uint addr, int *ip)
 {
-
+	struct proc *curproc = myproc();
+	// not above stack
   if(addr >= (STACKFRAME) || addr+4 > (STACKFRAME))
     return -1;
+	// not between heap and stack
+	if (addr >= curproc->sz && addr < PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1)))
+		return -1;
   *ip = *(int*)(addr);
   return 0;
 }
@@ -31,9 +35,11 @@ int
 fetchstr(uint addr, char **pp)
 {
   char *s, *ep;
-
+	struct proc *curproc = myproc();
   if(addr >= (STACKFRAME))
     return -1;
+	if (addr >= curproc->sz && addr < PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1)))
+		return -1;
   *pp = (char*)addr;
   ep = (char*)(STACKFRAME);
   for(s = *pp; s < ep; s++){
@@ -57,11 +63,16 @@ int
 argptr(int n, char **pp, int size)
 {
   int i;
- 
+	struct proc *curproc = myproc();
+ 	// fetch into i for checking
   if(argint(n, &i) < 0)
     return -1;
-  if(size < 0 || (uint)i >= (STACKFRAME) || (uint)i+size > (STACKFRAME))
+  // not above stack
+	if(size < 0 || (uint)i >= (STACKFRAME) || (uint)i+size > (STACKFRAME))
     return -1;
+	// not beween stack and heap
+	if ((uint)i + size > curproc->sz && (uint)i < PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1)))
+		return -1;
   *pp = (char*)i;
   return 0;
 }
