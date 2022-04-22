@@ -63,15 +63,19 @@ exec(char *path, char **argv)
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
   sz = PGROUNDUP(sz);
-  if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
-    goto bad;
-  clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  sp = sz;
+	
+	//alloc uvm will always align according to KERNBASE due to its rounding via round or subtracting a page
+	//eg will always have allocated memory within the word below KERNBASE
+  if((sp = allocuvm(pgdir, PGROUNDDOWN(STACKFRAME), STACKFRAME)) == 0) {
+		 goto bad;
+	}
+	//cprintf("where the gaurd will be %x\n",PGROUNDDOWN(STACKFRAME - PGSIZE));	
+  //clearpteu(pgdir, (char*)((STACKFRAME) - 2*PGSIZE));
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
-      goto bad;
+      goto bad;;
     sp = (sp - (strlen(argv[argc]) + 1)) & ~3;
     if(copyout(pgdir, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
       goto bad;
@@ -92,14 +96,16 @@ exec(char *path, char **argv)
     if(*s == '/')
       last = s+1;
   safestrcpy(curproc->name, last, sizeof(curproc->name));
-
-  // Commit to the user image.
+  
+	// Commit to the user image.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
   curproc->sz = sz;
   curproc->tf->eip = elf.entry;  // main
   curproc->tf->esp = sp;
-  switchuvm(curproc);
+  curproc->pages = 1;
+	//curproc->sp = PGROUNDDOWN(sp);
+	switchuvm(curproc);
   freevm(oldpgdir);
   return 0;
 
