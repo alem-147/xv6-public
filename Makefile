@@ -181,6 +181,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_tproc\
+	_tproc2\
 	#_usertests\
 
 fs.img: mkfs README $(UPROGS)
