@@ -338,11 +338,13 @@ copyuvm(pde_t *pgdir, uint sz)
       goto bad;
     }
   }
-	for(i = (PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1))); i < STACKFRAME; i += PGSIZE){
+	//cprintf("bottom of pages %x\n",PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1)*PGSIZE));
+	for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages - 1)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
 	//for(i = myproc()->sp; i < STACKFRAME; i += PGSIZE){
+		cprintf("i at %x\n",i);
 	  if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
-    cprintf("PTE: %x\n",pte);
+   // cprintf("PTE: %x\n",pte);
 		if(!(*pte & PTE_P))
       panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);
