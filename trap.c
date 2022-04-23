@@ -78,17 +78,20 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
 	case T_PGFLT: ;
+		// get fault address
 		uint fault_addr = rcr2();
 		cprintf("offending addr at %x\n",fault_addr);
+		// get next page
 		uint next_page = PGROUNDDOWN(STACKFRAME - (myproc()->pages)*PGSIZE);
+		// check that our fault is below our stack but also within the next page
 		if(fault_addr >= next_page && (fault_addr -  PGROUNDDOWN(next_page - PGSIZE)) < 2*PGSIZE) {
-			cprintf("next page at %x old sp at %x\n",next_page, PGROUNDUP(next_page + PGSIZE));
-			cprintf("new guard at %x\n",PGROUNDDOWN(next_page-PGSIZE));
-			cprintf("allocating from %x to %x\n",PGROUNDDOWN(next_page - PGSIZE), PGROUNDUP(next_page));
+			// allocate below the page guard (trying to realloc the page guard raises a panic)
 			if(allocuvm(myproc()->pgdir,PGROUNDDOWN(next_page - PGSIZE),PGROUNDUP(next_page))) {
-			//if(allocuvm(myproc()->pgdir,PGROUNDDOWN(next_page - PGSIZE),PGROUNDUP(next_page+PGSIZE))) {
+				// set our new page guard (next two lines are techincally unnecesary)
 				clearpteu(myproc()->pgdir, (char*)(PGROUNDDOWN(next_page - PGSIZE)));
+				// set old guard as usable page
 				setpteu(myproc()->pgdir, (char*)(PGROUNDDOWN(next_page)));
+				// increment pages
 				myproc()->pages += 1;
 				cprintf("growin stack\n");
 			}

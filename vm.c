@@ -316,13 +316,13 @@ void
 setpteu(pde_t *pgdir, char *uva)
 {
   pte_t *pte;
-
+	// grab page table entry
   pte = walkpgdir(pgdir, uva, 0);
-  if(pte == 0)
+  //check that it exists
+	if(pte == 0)
     panic("setpteu");
-	cprintf("cur flags %x at uva %x\n",PTE_FLAGS(*pte), uva);
+	// set our user flag
   *pte |= PTE_U;
-	cprintf("set flags %x at uva %x\n",PTE_FLAGS(*pte), uva);
 }
 // Given a parent process's page table, create a copy
 // of it for a child.
@@ -351,20 +351,25 @@ copyuvm(pde_t *pgdir, uint sz)
       goto bad;
     }
   }
-	cprintf("bottom of pages %x\n",PGROUNDDOWN(STACKFRAME - (myproc()->pages)*PGSIZE));
-	//for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages - 1)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
+	
+	// copy from page guard up to top of stack
 	for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
-		cprintf("i at %x\n",i);
-	  if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
+	  // grab pte
+		if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
+		// check it is present
 		if(!(*pte & PTE_P))
       panic("copyuvm: page not present");
-		cprintf("pte %x flags %x\n", pte, PTE_FLAGS(*pte));
-    pa = PTE_ADDR(*pte);
+    // get physical addr of PTE
+		pa = PTE_ADDR(*pte);
+		// get flags of pte
     flags = PTE_FLAGS(*pte);
+		// allocate memory in kernel space
     if((mem = kalloc()) == 0)
       goto bad;
+		// move new stuff to personal space?
     memmove(mem, (char*)P2V(pa), PGSIZE);
+		// map the pages
     if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0) {
       kfree(mem);
       goto bad;
