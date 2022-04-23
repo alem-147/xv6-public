@@ -81,11 +81,14 @@ trap(struct trapframe *tf)
 		uint fault_addr = rcr2();
 		cprintf("offending addr at %x\n",fault_addr);
 		uint next_page = PGROUNDDOWN(STACKFRAME - (myproc()->pages)*PGSIZE);
-		cprintf("next page at %x old sp at %x\n",next_page, PGROUNDUP(next_page + PGSIZE));
-		cprintf("new guard at %x\n",PGROUNDDOWN(next_page-PGSIZE));
-		if(fault_addr >= next_page) {
-			if(allocuvm(myproc()->pgdir,PGROUNDDOWN(next_page),PGROUNDUP(next_page+PGSIZE))) {
-				//clearpteu(myproc()->pgdir, (char*)(PGROUNDDOWN(next_page - PGSIZE)));
+		if(fault_addr >= next_page && (fault_addr -  PGROUNDDOWN(next_page - PGSIZE)) < 2*PGSIZE) {
+			cprintf("next page at %x old sp at %x\n",next_page, PGROUNDUP(next_page + PGSIZE));
+			cprintf("new guard at %x\n",PGROUNDDOWN(next_page-PGSIZE));
+			cprintf("allocating from %x to %x\n",PGROUNDDOWN(next_page - PGSIZE), PGROUNDUP(next_page));
+			if(allocuvm(myproc()->pgdir,PGROUNDDOWN(next_page - PGSIZE),PGROUNDUP(next_page))) {
+			//if(allocuvm(myproc()->pgdir,PGROUNDDOWN(next_page - PGSIZE),PGROUNDUP(next_page+PGSIZE))) {
+				clearpteu(myproc()->pgdir, (char*)(PGROUNDDOWN(next_page - PGSIZE)));
+				setpteu(myproc()->pgdir, (char*)(PGROUNDDOWN(next_page)));
 				myproc()->pages += 1;
 				cprintf("growin stack\n");
 			}

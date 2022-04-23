@@ -66,11 +66,12 @@ exec(char *path, char **argv)
 	
 	//alloc uvm will always align according to KERNBASE due to its rounding via round or subtracting a page
 	//eg will always have allocated memory within the word below KERNBASE
-  if((sp = allocuvm(pgdir, PGROUNDDOWN(STACKFRAME), STACKFRAME)) == 0) {
+  //if((sp = allocuvm(pgdir, PGROUNDDOWN(STACKFRAME), STACKFRAME)) == 0) {
+  if((sp = allocuvm(pgdir, PGROUNDDOWN(STACKFRAME - PGSIZE), STACKFRAME)) == 0) {
 		 goto bad;
 	}
 	cprintf("where the gaurd will be %x\n",PGROUNDDOWN(STACKFRAME - PGSIZE));	
-  //clearpteu(pgdir, (char*)(PGROUNDDOWN(STACKFRAME - PGSIZE)));
+  clearpteu(pgdir, (char*)(PGROUNDDOWN(STACKFRAME - PGSIZE)));
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {

@@ -351,15 +351,15 @@ copyuvm(pde_t *pgdir, uint sz)
       goto bad;
     }
   }
-	//cprintf("bottom of pages %x\n",PGROUNDDOWN(STACKFRAME - (myproc()->pages - 1)*PGSIZE));
-	for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages - 1)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
-	//for(i = myproc()->sp; i < STACKFRAME; i += PGSIZE){
+	cprintf("bottom of pages %x\n",PGROUNDDOWN(STACKFRAME - (myproc()->pages)*PGSIZE));
+	//for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages - 1)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
+	for(i = (PGROUNDDOWN(STACKFRAME -((myproc()->pages)*PGSIZE))); i < STACKFRAME; i += PGSIZE){
 		cprintf("i at %x\n",i);
 	  if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
-   // cprintf("PTE: %x\n",pte);
 		if(!(*pte & PTE_P))
       panic("copyuvm: page not present");
+		cprintf("pte %x flags %x\n", pte, PTE_FLAGS(*pte));
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
