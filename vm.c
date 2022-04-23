@@ -311,6 +311,19 @@ clearpteu(pde_t *pgdir, char *uva)
   *pte &= ~PTE_U;
 }
 
+//set PTE_U on a page. Used to remap a page guard
+void
+setpteu(pde_t *pgdir, char *uva)
+{
+  pte_t *pte;
+
+  pte = walkpgdir(pgdir, uva, 0);
+  if(pte == 0)
+    panic("setpteu");
+	cprintf("cur flags %x at uva %x\n",PTE_FLAGS(*pte), uva);
+  *pte |= PTE_U;
+	cprintf("set flags %x at uva %x\n",PTE_FLAGS(*pte), uva);
+}
 // Given a parent process's page table, create a copy
 // of it for a child.
 pde_t*
